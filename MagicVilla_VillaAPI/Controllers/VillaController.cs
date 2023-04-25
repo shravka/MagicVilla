@@ -1,8 +1,11 @@
-﻿using MagicVilla_VillaAPI.Data;
+﻿using AutoMapper;
+using MagicVilla_VillaAPI.Data;
 using MagicVilla_VillaAPI.DTO;
 using MagicVilla_VillaAPI.Logging;
+using MagicVilla_VillaAPI.Model;
 using MagicVilla_VillaAPI.VillaDataStore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MagicVilla_VillaAPI.Controllers
 {
@@ -12,18 +15,20 @@ namespace MagicVilla_VillaAPI.Controllers
     {
         private readonly ILogging _Ilogger;
         private readonly ApplicationDBContext _dbContext;
+        private readonly IMapper _mapper;
 
-        VillaController(ILogging logger ,ApplicationDBContext dBContext)
+        public VillaController(ILogging logger ,ApplicationDBContext dBContext, IMapper mapper)
         {
             _Ilogger = logger;
             _dbContext = dBContext;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [ProducesResponseType(200)]
         public ActionResult<IEnumerable<VillaDTO>> GetVillas()
         {
-            return Ok(VillaData.villaList);
+            return Ok(_mapper.Map<List<VillaDTO>>(_dbContext.Villas));
         }
 
 
@@ -34,7 +39,7 @@ namespace MagicVilla_VillaAPI.Controllers
         public ActionResult<VillaDTO> GetVillaById(int id)
         {
             if (id == 0) { return BadRequest(); }
-            var result = VillaData.villaList.Where(villa => villa.Id == id).FirstOrDefault();
+            var result = _dbContext.Villas.FirstOrDefault(villa => villa.Id == id);
             if (result == null) { return NotFound(); }
             return Ok(result);
         }
@@ -42,39 +47,75 @@ namespace MagicVilla_VillaAPI.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<VillaDTO> CreateVilla([FromBody] VillaDTO entity)
+        public ActionResult<VillaCreateDTO> CreateVilla([FromBody] VillaCreateDTO entity)
         {
             //if(!ModelState.IsValid)
             //{
             //    return BadRequest(ModelState);
             //}
-            if (VillaData.villaList.Where(item => item.Name == entity.Name).Any())
+            if (_dbContext.Villas.Where(item => item.Name == entity.Name).Any())
             {
                 ModelState.AddModelError("CustomError", "Name already Exists");
             }
 
             if (entity == null) { return BadRequest(); }
+            //Villa model = new()
+            //{
+            //    Name = entity.Name,
+            //    Amenity = entity.Amenity,
+            //    Details = entity.Details,
+            //    ImageUrl = entity.ImageUrl,
+            //    Occupancy = entity.Occupancy,
+            //    Rate = entity.Rate,
+            //    Sqft = entity.Sqft,
+            //    CreatedDate = DateTime.Now
 
-            VillaData.villaList.Add(entity);
-            Console.WriteLine(VillaData.villaList.Count);
-            return CreatedAtRoute("GetVilla", new VillaDTO { Id = entity.Id }, entity);
-            //return Ok(entity);
+            //};
+            var model = _mapper.Map<Villa>(entity);
+            _dbContext.Villas.Add(model);
+            _dbContext.SaveChanges();
+            return CreatedAtRoute("GetVilla", new { Id = model.Id }, model);
+           
         }
 
         [HttpPut]
-        public ActionResult<VillaDTO> UpdateVilla(VillaDTO entity)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public ActionResult<VillaUpdateDTO> UpdateVilla(VillaUpdateDTO entity)
         {
-            var result = VillaData.villaList.Where(villa => villa.Id == entity.Id).FirstOrDefault();
-            result.Name = entity.Name;
+            var result = _dbContext.Villas.AsNoTracking().FirstOrDefault(villa => villa.Id == entity.Id);
+            if(result == null) { return BadRequest(); }
+
+            //Villa model = new()
+            //{
+            //    Id = entity.Id,
+            //    Name = entity.Name,
+            //    Amenity = entity.Amenity,
+            //    Details = entity.Details,
+            //    ImageUrl = entity.ImageUrl,
+            //    Occupancy = entity.Occupancy,
+            //    Rate = entity.Rate,
+            //    Sqft = entity.Sqft,
+            //    CreatedDate = DateTime.Now
+
+            //};
+            var model = _mapper.Map<Villa>(entity);
+            _dbContext.Update(model);
+            _dbContext.SaveChanges();
             return NoContent();
         }
 
         [HttpDelete("{id:int}", Name = "DeleteVilla")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public ActionResult Deletevilla(int id)
         {
 
-            var result = VillaData.villaList.Where(villa => villa.Id == id).FirstOrDefault();
-            if (result != null) { VillaData.villaList.Remove(result); }
+            var result = _dbContext.Villas.FirstOrDefault(villa => villa.Id == id);
+
+            if(result == null) { return BadRequest(); }
+            _dbContext.Villas.Remove(result); 
+            _dbContext.SaveChanges();
             return NoContent();
         }
 
