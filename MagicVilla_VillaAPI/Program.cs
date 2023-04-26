@@ -3,7 +3,7 @@ using MagicVilla_VillaAPI.Data;
 using MagicVilla_VillaAPI.Logging;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-
+using MagicVilla_VillaAPI.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +28,7 @@ builder.Services.AddControllers(option =>
 //builder.Services.AddControllers();
 
 builder.Services.AddSingleton<ILogging, Logging>();
+builder.Services.AddScoped<IRepository, VillaRepository>();
 
 var app = builder.Build();
 
