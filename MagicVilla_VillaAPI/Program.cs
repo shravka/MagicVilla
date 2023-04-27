@@ -28,7 +28,8 @@ builder.Services.AddControllers(option =>
 //builder.Services.AddControllers();
 
 builder.Services.AddSingleton<ILogging, Logging>();
-builder.Services.AddScoped<IRepository, VillaRepository>();
+builder.Services.AddScoped<IVillaRepository, VillaRepository>();
+//builder.Services.AddScoped<IRepository<T>, Repository<TagHelperServicesExtensions>>();
 
 var app = builder.Build();
 

@@ -1,23 +1,21 @@
 ﻿using MagicVilla_VillaAPI.Model;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Collections.Generic;
 
 namespace MagicVilla_VillaAPI.Repository
 {
-    public interface IRepository 
+    public interface IRepository<T> where T : class
     {
-        Task<List<Villa>> GetAsyncAll(Expression<Func<Villa,bool>> filter=null);
+        Task<List<T>> GetAsyncAll(Expression<Func<T,bool>> filter = null);
 
-        Task<Villa> GetAsyncVilla(Expression<Func<Villa,bool>> filter = null,bool tracked=false);
+        Task<T> GetAsyncVilla(Expression<Func<T, bool>> filter = null, bool tracked = false);
 
-        Task CreateAsync(Villa villa);
+        Task CreateAsync(T entity);
 
-        Task RemoveAsync(Villa villa);
+        Task RemoveAsync(T entity);
 
-        Task UpdateAsync(Villa villa);
+        //Task<T> UpdateAsync(T entity);
 
         Task SaveAsync();
-
-       
     }
 }

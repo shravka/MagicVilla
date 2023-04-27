@@ -5,57 +5,21 @@ using System.Linq.Expressions;
 
 namespace MagicVilla_VillaAPI.Repository
 {
-    public class VillaRepository :IRepository
+    public class VillaRepository : Repository<Villa>, IVillaRepository
     {
         private readonly ApplicationDBContext _dbContext;
-        public VillaRepository(ApplicationDBContext dbContext) {
+        public VillaRepository(ApplicationDBContext dbContext) : base(dbContext)
+        {
 
             _dbContext = dbContext;
         }
-
-        public async  Task<List<Villa>> GetAsyncAll(Expression<Func<Villa,bool>> filter=null)
+        public async Task<Villa> UpdateAsync(Villa villa)
         {
-           IQueryable<Villa> query = _dbContext.Villas;
-           if (filter!=null)
-            {
-                query = query.Where(filter);
-            }
-            return await query.ToListAsync() ;
-        }
-
-        public async Task<Villa> GetAsyncVilla(Expression<Func<Villa, bool>> filter, bool tracked=false)
-        {
-            IQueryable<Villa> query = _dbContext.Villas;
-            if (tracked)
-                query = query.AsNoTracking();
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-            return await query.FirstOrDefaultAsync();
-        }
-        public async Task CreateAsync(Villa villa)
-        {
-           await _dbContext.AddAsync(villa);
-           await SaveAsync();
-        }
-
-        public async Task RemoveAsync(Villa villa)
-        {
-            _dbContext.Remove(villa);
-            await SaveAsync();
-        }
-
-        public async Task UpdateAsync(Villa villa)
-        {
+            villa.CreatedDate = DateTime.Now;
             _dbContext.Update(villa);
-            await SaveAsync();
+            await _dbContext.SaveChangesAsync();
+            return villa;
         }
 
-        public async Task SaveAsync()
-        {
-            await _dbContext.SaveChangesAsync();
-        }       
     }
 }
