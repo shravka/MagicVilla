@@ -4,8 +4,8 @@ using System.Linq.Expressions;
 
 namespace MagicVilla_VillaAPI.Repository
 {
-    public interface IVillaRepository :IRepository<Villa>
+    public interface IVillaNumberRepository : IRepository<VillaNumber>
     {
-        Task<Villa> UpdateAsync(Villa villa);       
+        Task<VillaNumber> UpdateAsync(VillaNumber villa);
     }
 }
