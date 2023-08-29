@@ -2,6 +2,7 @@
 using MagicVilla_VillaAPI.DTO;
 using MagicVilla_VillaAPI.Logging;
 using MagicVilla_VillaAPI.Model;
+using MagicVilla_VillaAPI.Model.DTO;
 using MagicVilla_VillaAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
