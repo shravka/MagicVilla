@@ -53,6 +53,7 @@ builder.Services.AddSingleton<ILogging, Logging>();
 builder.Services.AddScoped<IVillaRepository, VillaRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVillaNumberRepository, VillaNumberRepository>();
+
 //builder.Services.AddScoped<IRepository<T>, Repository<TagHelperServicesExtensions>>();
 
 var app = builder.Build();
