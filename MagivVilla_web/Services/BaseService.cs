@@ -3,6 +3,7 @@ using MagicVilla_web.Models;
 using MagicVilla_web.Models.DTO;
 using MagivVilla_web.Services.IServices;
 using Newtonsoft.Json;
+using System.Net;
 using System.Text;
 
 namespace MagivVilla_web.Services
@@ -51,10 +52,24 @@ namespace MagivVilla_web.Services
                 apiResponse = await client.SendAsync(message);
 
                 var apiContent = await apiResponse.Content.ReadAsStringAsync();
-                var APIResponse = JsonConvert.DeserializeObject<T>(apiContent);
-                return APIResponse;
-            
-            
+                try
+                {
+                    var APIResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
+                    if(APIResponse.statusCode==HttpStatusCode.NotFound ||
+                        APIResponse.statusCode==HttpStatusCode.BadRequest) {
+                        APIResponse.IsSucess = false;
+                    }
+                    var res = JsonConvert.SerializeObject(APIResponse);
+                    var resObject = JsonConvert.DeserializeObject<T>(res);
+                    return resObject;
+                }
+                catch (Exception)
+                {
+
+                    var APIResponse = JsonConvert.DeserializeObject<T>(apiContent);
+                    return APIResponse;
+                }
+                
             }
             catch(Exception ex)
             {

@@ -63,7 +63,8 @@ namespace MagicVilla_VillaAPI.Controllers
             var villaNumber = await _repository.GetAsyncVilla(item => item.VillaNo == entity.VillaNo);
             if (villaNumber != null)
             {
-                ModelState.AddModelError("CustomError", "Villa already Exists");
+                //changing this from custom to errormessages will ensure ErrorMessage gets populated
+                ModelState.AddModelError("ErrorMessages", "Villa already Exists");
                 return BadRequest(ModelState);
             }
 
