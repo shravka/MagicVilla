@@ -1,1 +1,52 @@
-﻿
+﻿@model MagivVilla_web.Models.ViewModel.UpdateVillaNumberVM
+
+<form asp-action="UpdateVillaNumber">
+    <br />
+    <div class="container border p-3">
+        <h1 class="text-primary">Update Villa Number</h1>
+        <hr />
+        <div class="row">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="col-2">
+                <label asp-for="villaNumber.VillaNo" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="villaNumber.VillaNo" class="form-control" />
+                <span asp-validation-for="villaNumber.VillaNo" class="text-danger"></span>
+            </div>
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-2">
+                <label asp-for="villaNumber.VillaID" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="villaNumber.VillaID" class="form-select" asp-items="@Model.villaList">
+                    <option disabled selected>------select Villa-----</option>
+                </select>
+                <span asp-validation-for="villaNumber.VillaID" class="text-danger"></span>
+            </div>
+
+
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-2">
+                <label asp-for="villaNumber.SpecialDetails" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="villaNumber.SpecialDetails" class="form-control" />
+                <span asp-validation-for="villaNumber.SpecialDetails" class="text-danger"></span>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Update" class="btn btn-success form-control" />
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

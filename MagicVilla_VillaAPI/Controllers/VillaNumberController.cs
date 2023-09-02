@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MagicVilla_VillaAPI.DTO;
 using MagicVilla_VillaAPI.Logging;
+using MagicVilla_VillaAPI.Migrations;
 using MagicVilla_VillaAPI.Model;
 using MagicVilla_VillaAPI.Model.DTO;
 using MagicVilla_VillaAPI.Repository;
@@ -78,19 +79,37 @@ namespace MagicVilla_VillaAPI.Controllers
 
         }
 
-        [HttpPut]
+        [HttpPut("{id:int}", Name = "UpdateVillaNumber")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<VillaUpdateDTO>> UpdateVillaNumber(VillaNumberUpdateDTO entity)
+        public async Task<ActionResult<APIResponse>> UpdateVillaNumber(int id,[FromBody]VillaNumberUpdateDTO updateDTO)
         {
-            var result = await _repository.GetAsyncVilla(villa => villa.VillaNo == entity.VillaNo, true);
-            if (result == null) { return BadRequest(); }
+            try
+            {
+                if (updateDTO == null || id != updateDTO.VillaNo)
+                {
+                    return BadRequest();
+                }
+                //if (await _repository.GetAsyncVilla(u => u.VillaID == updateDTO.VillaID) == null)
+                //{
+                //    ModelState.AddModelError("ErrorMessages", "Villa ID is Invalid!");
+                //    return BadRequest(ModelState);
+                //}
+                VillaNumber model = _mapper.Map<VillaNumber>(updateDTO);
 
-            var model = _mapper.Map<VillaNumber>(entity);
-            await _repository.UpdateAsync(model);
-            _response.Result = _mapper.Map<VillaNumberDTO>(model);
-            _response.statusCode = HttpStatusCode.OK;
-            return Ok(_response);
+                await _repository.UpdateAsync(model);
+                _response.statusCode = HttpStatusCode.NoContent;
+                _response.IsSucess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSucess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+               
+            }
+            return _response;
         }
 
         [HttpDelete("{id:int}", Name = "DeleteVillaNumber")]
@@ -102,6 +121,8 @@ namespace MagicVilla_VillaAPI.Controllers
             var result = await _repository.GetAsyncVilla(villa => villa.VillaNo == id);
 
             if (result == null) { return BadRequest(); }
+
+           await  _repository.RemoveAsync(result);
             _response.Result = _mapper.Map<VillaNumberDTO>(result);
             _response.statusCode = HttpStatusCode.NoContent;
             return Ok(_response);
