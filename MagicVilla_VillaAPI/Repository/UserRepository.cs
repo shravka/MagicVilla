@@ -15,7 +15,7 @@ namespace MagicVilla_VillaAPI.Repository
         private readonly ApplicationDBContext _dbContext;
         private readonly string secretKey;
 
-        public UserRepository(ApplicationDBContext context,IConfiguration configuration)
+        public UserRepository(ApplicationDBContext context, IConfiguration configuration)
         {
             _dbContext = context;
             secretKey = configuration.GetValue<string>("ApiSetting:Secret");
@@ -23,7 +23,8 @@ namespace MagicVilla_VillaAPI.Repository
         public bool IsUniqueUser(string userName)
         {
             var user = _dbContext.LocalUser.FirstOrDefault(x => x.UserName == userName);
-            if(user!=null)return false;
+            if (user != null)
+                return false;
 
             return true;
         }
@@ -33,34 +34,43 @@ namespace MagicVilla_VillaAPI.Repository
             var user = _dbContext.LocalUser.FirstOrDefault(u => u.UserName.ToLower() == request.UserName.ToLower()
              && u.Password == request.Password);
             if (user == null)
-                return null;
+            {
+                return new LoginResponseDTO()
+                {
+                    Token = "",
+                    User = null
+                };
+            }
 
             //if user found generate JWT token
+            //JWT token needs secret key with which token is generated
+            //secret key is used to validate the token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);
 
             //claim - name of user , role of user etc
+            //what token should contain ,how it is configured, expiry
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new System.Security.Claims.ClaimsIdentity(new Claim[]
+                Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()), //can use email as wll
                     new Claim(ClaimTypes.Role, user.Role)
                 }),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials= new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return new LoginResponseDTO()
             {
-                token = tokenHandler.WriteToken(token),
+                Token = tokenHandler.WriteToken(token),
                 User = user
             };
 
         }
 
-        public async  Task<LocalUser> Register(RegistrationRequestDTO registerRequest)
+        public async Task<LocalUser> Register(RegistrationRequestDTO registerRequest)
         {
             LocalUser user = new()
             {
