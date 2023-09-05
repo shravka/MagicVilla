@@ -34,7 +34,7 @@ namespace MagicVilla_VillaAPI.Controllers
 
         [HttpGet]  // verb is also required else there will be error as it does not know what is the action
         [ProducesResponseType(200)]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult<APIResponse>> GetVillas()
         {
             _response.Result = _mapper.Map<List<VillaDTO>>(await _repository.GetAsyncAll());
@@ -42,15 +42,16 @@ namespace MagicVilla_VillaAPI.Controllers
             return Ok(_response);
         }
 
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpGet("{id:int}", Name = "GetVilla")] // {id:int} to ensure httpget calls are seperate from the previos one
-        //[Authorize(Roles ="Custom")]
+        
         //to document return type we use ProducesResponseType
         //200 is hardcoded better to use below one which is more readable
-        [ProducesResponseType(200)]
-        
+        [ProducesResponseType(200)]        
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
 
         //ActionResult for returning httpstats codes
         public async Task<ActionResult<APIResponse>> GetVillaById(int id)
@@ -139,10 +140,13 @@ namespace MagicVilla_VillaAPI.Controllers
             //return Ok(_response);
         }
 
+        [Authorize(Roles ="Custom")]
         [HttpDelete("{id:int}", Name = "DeleteVilla")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> Deletevilla(int id)
         {
             if(id==0) return BadRequest();
