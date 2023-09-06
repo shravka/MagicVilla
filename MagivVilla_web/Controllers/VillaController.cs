@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MagicVilla_Utility;
 using MagicVilla_web.Models;
 using MagicVilla_web.Models.DTO;
 using MagivVilla_web.Models;
@@ -25,7 +26,7 @@ namespace MagivVilla_web.Controllers
         public  async Task<IActionResult> IndexVilla()
         {
             List<VillaDTO> list = new();
-            var response = await _villaService.GetAllAsync<APIResponse>();
+            var response = await _villaService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionString));
 
             if (response != null && response.IsSucess)
             {
@@ -46,7 +47,7 @@ namespace MagivVilla_web.Controllers
         {
             if(ModelState.IsValid)
             {
-                var response = await _villaService.CreateAsync<APIResponse>(model);
+                var response = await _villaService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionString));
 
                 if (response != null && response.IsSucess)
                 {
@@ -61,7 +62,7 @@ namespace MagivVilla_web.Controllers
         {
 
             
-                var response = await _villaService.GetAsync<APIResponse>(villaId);
+                var response = await _villaService.GetAsync<APIResponse>(villaId, HttpContext.Session.GetString(SD.SessionString));
 
                 if (response != null && response.IsSucess)
                 {
@@ -81,7 +82,7 @@ namespace MagivVilla_web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _villaService.UpdateAsync<APIResponse>(model);
+                var response = await _villaService.UpdateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionString));
 
                 if (response != null && response.IsSucess)
                 {
@@ -93,7 +94,7 @@ namespace MagivVilla_web.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteVilla(int villaId)
         {
-            var response = await _villaService.GetAsync<APIResponse>(villaId);
+            var response = await _villaService.GetAsync<APIResponse>(villaId, HttpContext.Session.GetString(SD.SessionString));
 
             if (response != null && response.IsSucess)
             {
@@ -110,7 +111,7 @@ namespace MagivVilla_web.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteVilla(VillaDTO villaDTO)
         {
-           var response = await _villaService.DeleteAsync<APIResponse>(villaDTO.Id);
+           var response = await _villaService.DeleteAsync<APIResponse>(villaDTO.Id, HttpContext.Session.GetString(SD.SessionString));
 
            if (response != null && response.IsSucess)
                 {
