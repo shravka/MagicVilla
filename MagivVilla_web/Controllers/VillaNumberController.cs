@@ -5,10 +5,12 @@ using MagivVilla_web.Models;
 using MagivVilla_web.Models.ViewModel;
 using MagivVilla_web.Services;
 using MagivVilla_web.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 
 namespace MagivVilla_web.Controllers
@@ -37,7 +39,7 @@ namespace MagivVilla_web.Controllers
             }
             return View(list);
         }
-
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreateVillaNumber()
         {
             CreateVillaNumberVM vm = new();
@@ -57,6 +59,7 @@ namespace MagivVilla_web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreateVillaNumber(CreateVillaNumberVM model)
         {
             if (ModelState.IsValid)
@@ -87,7 +90,7 @@ namespace MagivVilla_web.Controllers
             return View(model);
         }
 
-
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateVillaNumber(int villaNo)
         {
 
@@ -116,6 +119,7 @@ namespace MagivVilla_web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateVillaNumber(UpdateVillaNumberVM model)
         {
             if (ModelState.IsValid)
@@ -138,7 +142,7 @@ namespace MagivVilla_web.Controllers
             }
             return View(model);
         }
-
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteVillaNumber(int villaNo)
         {
 

@@ -54,14 +54,17 @@ namespace MagivVilla_web.Services
                 var apiContent = await apiResponse.Content.ReadAsStringAsync();
                 try
                 {
-                    var APIResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
-                    if(APIResponse.statusCode==HttpStatusCode.NotFound ||
-                        APIResponse.statusCode==HttpStatusCode.BadRequest) {
-                        APIResponse.IsSucess = false;
+                    APIResponse ApiResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
+                    if(ApiResponse != null && (ApiResponse.statusCode==HttpStatusCode.NotFound ||
+                        ApiResponse.statusCode==HttpStatusCode.BadRequest)) 
+                    {
+                        ApiResponse.statusCode = HttpStatusCode.BadRequest;
+                        ApiResponse.IsSucess = false;
+                        var res = JsonConvert.SerializeObject(ApiResponse);
+                        var resObject = JsonConvert.DeserializeObject<T>(res);
+                        return resObject;
                     }
-                    var res = JsonConvert.SerializeObject(APIResponse);
-                    var resObject = JsonConvert.DeserializeObject<T>(res);
-                    return resObject;
+                   
                 }
                 catch (Exception)
                 {
@@ -69,7 +72,9 @@ namespace MagivVilla_web.Services
                     var APIResponse = JsonConvert.DeserializeObject<T>(apiContent);
                     return APIResponse;
                 }
-                
+                var result = JsonConvert.DeserializeObject<T>(apiContent);
+                return result;
+
             }
             catch(Exception ex)
             {

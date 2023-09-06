@@ -1,7 +1,12 @@
-﻿using MagicVilla_web.Models;
+﻿using MagicVilla_Utility;
+using MagicVilla_web.Models;
 using MagicVilla_web.Models.DTO;
 using MagivVilla_web.Services.IServices;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace MagivVilla_web.Controllers
 {
@@ -25,8 +30,28 @@ namespace MagivVilla_web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login( LoginRequestDTO obj)
         {
+            APIResponse result = await _authService.LoginAsync<APIResponse>(obj);
+            if (result != null && result.IsSucess)
+            {
+                LoginResponseDTO loginResponseDTO = JsonConvert.DeserializeObject<LoginResponseDTO>(result.Result.ToString());
 
-            return View();
+
+                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                identity.AddClaim(new Claim(ClaimTypes.Name, loginResponseDTO.User.UserName));
+                identity.AddClaim(new Claim(ClaimTypes.Role, loginResponseDTO.User.Role));
+                var principal = new ClaimsPrincipal(identity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+
+                HttpContext.Session.SetString(SD.SessionString, loginResponseDTO.Token);
+                return RedirectToAction("Index", "Home");
+             }
+            else
+            {
+                ModelState.AddModelError("CustomError", result.ErrorMessages.FirstOrDefault());
+                return View(obj);
+            }
+            
         }
 
 
@@ -56,9 +81,12 @@ namespace MagivVilla_web.Controllers
             return View();
         }
 
-        public IActionResult LogOut()
+        public async Task<IActionResult> Logout()
         {
-            return View();
+            await HttpContext.SignOutAsync();
+            HttpContext.Session.SetString(SD.SessionString, "");
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
