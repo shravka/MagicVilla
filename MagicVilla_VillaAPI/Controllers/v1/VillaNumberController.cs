@@ -12,7 +12,6 @@ namespace MagicVilla_VillaAPI.Controllers.v1
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
-    [ApiVersion("2")]
     [ApiController]
     public class VillaNumberController : ControllerBase
     {
@@ -31,20 +30,11 @@ namespace MagicVilla_VillaAPI.Controllers.v1
 
         [HttpGet]
         [ProducesResponseType(200)]
-        [MapToApiVersion("1")]
         public async Task<ActionResult<APIResponse>> GetVillaNumber()
         {
             _response.Result = _mapper.Map<List<VillaNumberDTO>>(await _repository.GetAsyncAll(includeProperties: "Villa"));
             _response.statusCode = HttpStatusCode.OK;
             return Ok(_response);
-        }
-
-        [HttpGet]
-        [ProducesResponseType(200)]
-        [MapToApiVersion("2")]
-        public string GetVillaNumberV2()
-        {
-            return "abc" + " defgjg";
         }
 
         [HttpGet("{id:int}", Name = "GetVillaNumber")]

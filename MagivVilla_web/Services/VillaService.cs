@@ -21,7 +21,7 @@ namespace MagivVilla_web.Services
             {
                 APIType = SD.APIType.POST,
                 Data = dto,
-                Url = villaUrl + "/api/Villa",
+                Url = villaUrl + "/api/v1/Villa",
                 Token = token
             });
         }
@@ -31,7 +31,7 @@ namespace MagivVilla_web.Services
             return SendAsync<T>(new APIRequest()
             {
                 APIType = SD.APIType.DELETE,
-                Url = villaUrl + "/api/villa/" + id,
+                Url = villaUrl + "/api//v1/villa/" + id,
                  Token = token
             });
         }
@@ -41,7 +41,7 @@ namespace MagivVilla_web.Services
             return SendAsync<T>(new APIRequest()
             {
                 APIType = SD.APIType.GET,
-                Url = villaUrl + "/api/villa",
+                Url = villaUrl + "/api//v1/villa",
                 Token = token
             });
         }
@@ -51,7 +51,7 @@ namespace MagivVilla_web.Services
             return SendAsync<T>(new APIRequest()
             {
                 APIType = SD.APIType.GET,
-                Url = villaUrl + "/api/villa/" + id,
+                Url = villaUrl + "/api//v1/villa/" + id,
                 Token = token
             });
 
@@ -63,7 +63,7 @@ namespace MagivVilla_web.Services
             {
                 APIType = SD.APIType.PUT,
                 Data = dto,
-                Url = villaUrl + "/api/villa/" + dto.Id,
+                Url = villaUrl + "/api/v1/villa/" + dto.Id,
                 Token = to
             });
         }

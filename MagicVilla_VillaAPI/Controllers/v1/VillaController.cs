@@ -14,7 +14,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
     //route name is required this defines the path for the endpoint
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")] // this works as default is 1
-    [ApiVersion("2.0")] // this fails as we need to pass some version to API.
+    //[ApiVersion("2.0")] // this fails as we need to pass some version to API.
 
     //multiple versions support needs to be mentioned on controller
     //this is not so right method as if controller name changes route will automatically change so better 
@@ -38,7 +38,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
 
         [HttpGet]  // verb is also required else there will be error as it does not know what is the action
         [ProducesResponseType(200)]
-        [Authorize]
+       // [Authorize]
         public async Task<ActionResult<APIResponse>> GetVillas()
         {
             _response.Result = _mapper.Map<List<VillaDTO>>(await _repository.GetAsyncAll());
@@ -46,7 +46,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
             return Ok(_response);
         }
 
-        [Authorize(Roles = "admin")]
+       // [Authorize(Roles = "admin")]
         [HttpGet("{id:int}", Name = "GetVilla")] // {id:int} to ensure httpget calls are seperate from the previos one
 
         //to document return type we use ProducesResponseType
