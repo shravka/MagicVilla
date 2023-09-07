@@ -8,9 +8,11 @@ using MagicVilla_VillaAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace MagicVilla_VillaAPI.Controllers
+namespace MagicVilla_VillaAPI.Controllers.v2
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2")]
     [ApiController]
     public class VillaNumberController : ControllerBase
     {
@@ -29,11 +31,20 @@ namespace MagicVilla_VillaAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(200)]
+        [MapToApiVersion("1")]
         public async Task<ActionResult<APIResponse>> GetVillaNumber()
         {
-            _response.Result = _mapper.Map<List<VillaNumberDTO>>(await _repository.GetAsyncAll(includeProperties: "Villa")) ;
+            _response.Result = _mapper.Map<List<VillaNumberDTO>>(await _repository.GetAsyncAll(includeProperties: "Villa"));
             _response.statusCode = HttpStatusCode.OK;
             return Ok(_response);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(200)]
+        [MapToApiVersion("2")]
+        public string GetVillaNumberV2()
+        {
+            return "abc" + " defgjg";
         }
 
         [HttpGet("{id:int}", Name = "GetVillaNumber")]
@@ -82,7 +93,7 @@ namespace MagicVilla_VillaAPI.Controllers
         [HttpPut("{id:int}", Name = "UpdateVillaNumber")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<APIResponse>> UpdateVillaNumber(int id,[FromBody]VillaNumberUpdateDTO updateDTO)
+        public async Task<ActionResult<APIResponse>> UpdateVillaNumber(int id, [FromBody] VillaNumberUpdateDTO updateDTO)
         {
             try
             {
@@ -107,7 +118,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 _response.IsSucess = false;
                 _response.ErrorMessages
                      = new List<string>() { ex.ToString() };
-               
+
             }
             return _response;
         }
@@ -122,7 +133,7 @@ namespace MagicVilla_VillaAPI.Controllers
 
             if (result == null) { return BadRequest(); }
 
-           await  _repository.RemoveAsync(result);
+            await _repository.RemoveAsync(result);
             _response.Result = _mapper.Map<VillaNumberDTO>(result);
             _response.statusCode = HttpStatusCode.NoContent;
             return Ok(_response);

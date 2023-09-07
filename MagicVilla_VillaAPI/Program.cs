@@ -44,6 +44,40 @@ builder.Services.AddSwaggerGen(options => {
             new List<string>()
         }
     });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1.0",
+        Title = "Magic Villa",
+        Description = "",
+        TermsOfService = new Uri("https://dotnetmastery.com"),
+        Contact = new OpenApiContact
+        {
+            Name = "Shavka Test",
+            Url= new Uri("https://dotnetmastery.com")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "License",
+            Url= new Uri("https://dotnetmastery.com")
+        }
+    });
+    options.SwaggerDoc("v2", new OpenApiInfo
+    {
+        Version = "v2.0",
+        Title = "Magic Villa",
+        Description = "",
+        TermsOfService = new Uri("https://dotnetmastery.com"),
+        Contact = new OpenApiContact
+        {
+            Name = "Shavka Test",
+            Url=new Uri("https://dotnetmastery.com")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "License",
+            Url=new Uri("https://dotnetmastery.com")
+        }
+    }); 
 
 });
 
@@ -83,6 +117,24 @@ builder.Services.AddSingleton<ILogging, Logging>();
 builder.Services.AddScoped<IVillaRepository, VillaRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVillaNumberRepository, VillaNumberRepository>();
+
+//add this aaftr installing nuget packages , default version needs to be secified
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    options.ReportApiVersions=true;
+});
+
+//this is to tell swagger
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+
+});
+
+
 //builder.Services.AddScoped<IRepository<T>, Repository<TagHelperServicesExtensions>>();
 var app = builder.Build();
 
@@ -90,7 +142,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "MagicVillav1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "MagicVillav2");
+
+    });
 }
 
 app.UseHttpsRedirection();
